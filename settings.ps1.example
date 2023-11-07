@@ -7,19 +7,6 @@
 $INSTANCE_ROOT = ("$PSScriptRoot" | Resolve-Path)
 
 # =====================================================================//
-#  CURSEFORGE ACCOUNT SETTINGS
-# =====================================================================//
-
-$CURSEFORGE_USER = "MyCurseForgeUsername"
-
-# For details see: https://www.curseforge.com/account/api-tokens
-# Defined in secrets.ps1 
-# $CURSEFORGE_TOKEN = 
-
-# ProjectID can be found on the modpack's Curseforge Projects page, under "About This Project"
-$CURSEFORGE_PROJECT_ID = 123456
-
-# =====================================================================//
 #  MAIN MODPACK SETTINGS
 # =====================================================================//
 
@@ -92,11 +79,20 @@ $FOLDERS_TO_INCLUDE_IN_CLIENT_FILES = @(
 
 $CONFIGS_TO_REMOVE_FROM_CLIENT_FILES = @()
 
-$FOLDERS_TO_REMOVE_FROM_CLIENT_FILES = @("local/ftbutilities", "resourcepacks")
+$FOLDERS_TO_REMOVE_FROM_CLIENT_FILES = @(
+    "kubejs/probe",
+    "local/ftbchunks/data",
+	"local/ftbultimine",
+	"local/ftbultimine-client.snbt"
+    "local/ftbutilities",
+    "resourcepacks"
+)
 
 # Example: 
 # $FILES_TO_INCLUDE_IN_MODS_FOLDER_IN_CLIENT_FILES = @("mods/Apotheosis-1.19.2-6.2.1.jar", "mods/create-1.19.2-0.5.1.b.jar")
 $FILES_TO_INCLUDE_IN_MODS_FOLDER_IN_CLIENT_FILES = @()
+
+$FILES_TO_INCLUDE_IN_ROOT_FOLDER_IN_CLIENT_FILES = @()
 
 #=====================================================================//
 #  SERVER FILE SETTINGS
@@ -167,10 +163,10 @@ $ENABLE_GITHUB_RELEASE_MODULE = $false
 $CLIENT_ZIP_NAME = "$CLIENT_NAME-$MODPACK_VERSION"
 
 # Syntax of the Previous Versions Client ZIP File
-$LAST_MODPACK_ZIP_NAME = "$CLIENT_NAME-$LAST_MODPACK_VERSION"
+$LAST_MODPACK_ZIP_NAME = "$MODPACK_NAME-$LAST_MODPACK_VERSION"
 
 # Default: "$CLIENT_NAME $MODPACK_VERSION"
-$CLIENT_FILE_DISPLAY_NAME = "MyModpack $MODPACK_VERSION"
+$CLIENT_FILE_DISPLAY_NAME = "$CLIENT_NAME $MODPACK_VERSION"
 
 # Can be "markdown", "text" or "html"
 # Default: $CLIENT_CHANGELOG_TYPE
@@ -185,7 +181,7 @@ $SERVER_CHANGELOG = $CLIENT_CHANGELOG
 $SERVER_RELEASE_TYPE = $CLIENT_RELEASE_TYPE
 
 # Default: "$CLIENT_NAME Server $MODPACK_VERSION"
-$SERVER_ZIP_NAME = "$CLIENT_NAME`Server-$MODPACK_VERSION"
+$SERVER_ZIP_NAME = "$MODPACK_NAME-Server-$MODPACK_VERSION"
 
 # Default: $SERVER_FILENAME
-$SERVER_FILE_DISPLAY_NAME = "MyModpack Server $MODPACK_VERSION"
+$SERVER_FILE_DISPLAY_NAME = "$CLIENT_NAME Server $MODPACK_VERSION"

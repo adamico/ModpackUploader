@@ -5,7 +5,7 @@ $minecraftInstanceFile = "minecraftinstance.json"
 $overridesFolder = "overrides"
 $secretsFile = "secrets.ps1"
 
-function Validate-SecretsFile {
+function Approve-SecretsFile {
     if (!(Test-Path "$PSScriptRoot/$secretsFile")) {
         Write-Host "You need a valid CurseForge API Token in a $secretsFile file" -ForegroundColor Red
         Write-Host "Creating $secretsFile" -ForegroundColor Cyan
@@ -13,9 +13,8 @@ function Validate-SecretsFile {
     }
 }
 
-. "$PSScriptRoot/settings.ps1"
 . "$PSScriptRoot/$secretsFile"
-
+. "$PSScriptRoot/settings.ps1"
 
 function Get-GitHubRelease {
     param(
@@ -118,6 +117,18 @@ function New-ClientFiles {
             Copy-Item -Path $_ -Destination "$overridesFolder/$_" -Recurse
         }
 
+        $destinationFolder = "$overridesFolder"
+       
+        if (!(Test-Path -Path $destinationFolder)) {
+            New-Item $destinationFolder -Type Directory
+        }
+        $FILES_TO_INCLUDE_IN_ROOT_FOLDER_IN_CLIENT_FILES | ForEach-Object {
+            Write-Host "Adding " -ForegroundColor Cyan -NoNewline
+            Write-Host $_ -ForegroundColor Blue -NoNewline
+            Write-Host " to the root folder in the client files." -ForegroundColor Cyan
+            Copy-Item -Path $_ -Destination "$overridesFolder/$_" -Recurse
+        }
+
         Remove-BlacklistedFiles
 
         # Zipping up the newly created overrides folder and $manifest
@@ -125,7 +136,6 @@ function New-ClientFiles {
 
         Remove-Item $manifest -Force -Recurse -ErrorAction SilentlyContinue
         Write-Host "Client files $clientZip created!" -ForegroundColor Green
-
     }
 }
 
@@ -200,12 +210,7 @@ function Remove-BlacklistedFiles {
 }
 
 function New-Changelog {
-    if ($ENABLE_CHANGELOG_GENERATOR_MODULE `
-            -and $null -ne $MODPACK_VERSION `
-            -and $null -ne $LAST_MODPACK_VERSION `
-            -and (Test-Path "$INSTANCE_ROOT/$LAST_MODPACK_ZIP_NAME.zip") `
-            -and (Test-Path "$INSTANCE_ROOT/$CLIENT_ZIP_NAME.zip")
-    ) {
+    if ($ENABLE_CHANGELOG_GENERATOR_MODULE -and (Test-Path "$INSTANCE_ROOT/$LAST_MODPACK_ZIP_NAME.zip") -and (Test-Path "$INSTANCE_ROOT/$CLIENT_ZIP_NAME.zip")) {        
         if (-not (Test-Path $CHANGELOG_GENERATOR_JAR) -or $ENABLE_ALWAYS_UPDATE_JARS) {
             Remove-Item $CHANGELOG_GENERATOR_JAR -Recurse -Force -ErrorAction SilentlyContinue
             Get-GitHubRelease -repo "ModdingX/ModListCreator" -file $CHANGELOG_GENERATOR_JAR
@@ -223,6 +228,8 @@ function New-Changelog {
             --old "$LAST_MODPACK_ZIP_NAME.zip"
 
         Write-Host "Mod changelog generated!" -ForegroundColor Green
+    } else {
+        Write-Host "Skipping changelog generation beacause you don't have the correct new and old modpack files" -ForegroundColor Cyan
     }
 }
 
@@ -426,7 +433,7 @@ else {
 }
 
 Test-ForDependencies
-Validate-SecretsFile
+Approve-SecretsFile
 New-ClientFiles
 Push-ClientFiles
 if ($ENABLE_SERVER_FILE_MODULE -and -not $ENABLE_MODPACK_UPLOADER_MODULE) {
@@ -438,5 +445,3 @@ Update-Modlist
 
 Write-Host "Modpack Upload Complete!" -ForegroundColor Green
 Set-Location $startLocation
-
-pause
